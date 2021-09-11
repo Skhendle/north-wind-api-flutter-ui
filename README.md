@@ -1,6 +1,5 @@
-# novasat
-
-A new Flutter project.
+# north-wind-api-flutter-ui
+A flutter application that consumes the (North-Wind)[https://northwind.vercel.app/]
 
 ## Getting Started
 
