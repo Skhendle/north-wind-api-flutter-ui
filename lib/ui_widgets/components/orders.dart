@@ -16,7 +16,7 @@ class OrdersHeading extends StatelessWidget {
   final bool isSmallView;
   final OrderModel order;
 
-  Widget dateDisplay(String dateName, DateTime date) {
+  Widget dateDisplayDesktop(String dateName, DateTime date) {
     return Column(
       children: [
         Expanded(child: SizedBox.fromSize()),
@@ -55,15 +55,66 @@ class OrdersHeading extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget dateDisplayMobile(String dateName, DateTime date) {
     return Row(
       children: [
-        Expanded(child: dateDisplay('Order Date', order.orderDate)),
-        Expanded(child: dateDisplay('Shipped Date', order.shippedDate)),
-        Expanded(child: dateDisplay('Required Date', order.requiredDate))
+        Expanded(
+            flex: 2,
+            child: Text(
+              dateName,
+              textAlign: TextAlign.center,
+              style: (isMobile)
+                  ? TextStyle(
+                      fontSize: (isSmallView) ? 16 : 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w300)
+                  : TextStyle(
+                      fontSize: (isSmallView) ? 20 : 22,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w300),
+            )),
+        Expanded(
+            flex: 2,
+            child: Text(
+              DateFormat.yMd('en_US').format(date).toString(),
+              textAlign: TextAlign.center,
+              style: (isMobile)
+                  ? TextStyle(
+                      fontSize: (isSmallView) ? 16 : 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w300)
+                  : TextStyle(
+                      fontSize: (isSmallView) ? 20 : 22,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w300),
+            ))
       ],
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return isMobile
+        ? Column(children: [
+            Expanded(child: SizedBox.fromSize()),
+            Expanded(child: dateDisplayMobile('Order Date', order.orderDate)),
+            Expanded(
+                child: dateDisplayMobile('Shipped Date', order.shippedDate)),
+            Expanded(
+                child: dateDisplayMobile('Required Date', order.requiredDate)),
+            Expanded(child: SizedBox.fromSize())
+          ])
+        : Row(
+            children: [
+              Expanded(
+                  child: dateDisplayDesktop('Order Date', order.orderDate)),
+              Expanded(
+                  child: dateDisplayDesktop('Shipped Date', order.shippedDate)),
+              Expanded(
+                  child:
+                      dateDisplayDesktop('Required Date', order.requiredDate))
+            ],
+          );
   }
 }
 
@@ -116,21 +167,22 @@ class _OrdersGraphState extends State<OrdersGraph> {
       ),
       body: Column(
         children: [
-          Expanded(child: SizedBox.fromSize()),
+          Expanded(
+              child: Center(
+            child: Text(
+              'Grand Total: ${formatCurrency.format(productsTotal(widget.selectedOrder))}',
+              style: TextStyle(color: Colors.white, fontSize: 18),
+            ),
+          )),
           Expanded(
               flex: 4,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15.0),
+                padding: EdgeInsets.symmetric(
+                    horizontal: widget.isMobile ? 5.0 : 15.0),
                 child: OrdersGridGraph(
                   selectedOrder: widget.selectedOrder,
                   list: widget.list,
                 ),
-              )),
-          Expanded(
-              flex: 2,
-              child: Text(
-                'Grand Total: ${formatCurrency.format(productsTotal(widget.selectedOrder))}',
-                style: TextStyle(color: Colors.white, fontSize: 18),
               ))
         ],
       ),

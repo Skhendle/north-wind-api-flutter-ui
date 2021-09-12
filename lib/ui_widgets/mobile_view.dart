@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:novasat/bloc/main/main_bloc.dart';
 import 'package:novasat/bloc/navigation/navigation_bloc.dart';
+import 'package:novasat/ui_widgets/components/orders.dart';
 import 'package:novasat/ui_widgets/components/products.dart';
 
 import 'components/category.dart';
@@ -85,6 +86,13 @@ class _MobileLayout extends State<MobileLayout> {
                       child: BlocBuilder<MainBloc, MainState>(
                           bloc: context.read<MainBloc>(),
                           builder: (context, state) {
+                            if (state is Categories)
+                              return Text(
+                                'Categories',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 24),
+                              );
+
                             if (state is Products)
                               return Text(
                                 'Products',
@@ -97,9 +105,7 @@ class _MobileLayout extends State<MobileLayout> {
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 24));
 
-                            return Text('Categories',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 24));
+                            return Center(child: CircularProgressIndicator());
                           })),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.only(
@@ -146,10 +152,16 @@ class _MobileLayout extends State<MobileLayout> {
                           );
 
                         if (state is Orders)
-                          return Text('Orders',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 24));
-
+                          return Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 25.0),
+                            child: Center(
+                              child: OrdersHeading(
+                                isMobile: true,
+                                isSmallView: widget.isSmallView,
+                                order: state.selectedOrder,
+                              ),
+                            ),
+                          );
                         return Center(child: CircularProgressIndicator());
                       }),
                   decoration: BoxDecoration(
@@ -195,9 +207,18 @@ class _MobileLayout extends State<MobileLayout> {
                           );
 
                         if (state is Orders)
-                          return Text('Orders',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 24));
+                          return Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 15.0),
+                            child: Center(
+                                child: CustomerDropDownButton(
+                              itemsList: state.list,
+                              selectedItemIndex: state.index,
+                              isMobile: true,
+                              isSmallView: widget.isSmallView,
+                              bloc: context.read<MainBloc>(),
+                              state: 2,
+                            )),
+                          );
 
                         if (state is Error)
                           return Center(child: Text(state.msg));
@@ -235,9 +256,12 @@ class _MobileLayout extends State<MobileLayout> {
                               isSmallView: widget.isSmallView);
 
                         if (state is Orders)
-                          return Text('Orders',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 24));
+                          return OrdersGraph(
+                              selectedOrder: state.selectedOrder,
+                              list: state.list,
+                              showSideLabel: widget.isSmallView,
+                              isMobile: true,
+                              isSmallView: widget.isSmallView);
 
                         if (state is Error)
                           return Center(
