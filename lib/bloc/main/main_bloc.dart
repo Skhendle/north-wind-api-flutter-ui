@@ -45,7 +45,7 @@ class MainBloc extends Bloc<MainEvent, MainState> {
     if (event is OrdersEvent) {
       try {
         yield Loading();
-        var list = await repo.getorders();
+        var list = await repo.getOrders();
         yield Orders(
             selectedOrder: list[event.index], list: list, index: event.index);
       } catch (e) {

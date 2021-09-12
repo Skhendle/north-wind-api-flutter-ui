@@ -152,7 +152,6 @@ class _DesktopLayout extends State<DesktopLayout> {
                       bloc: context.read<MainBloc>(),
                       builder: (context, state) {
                         if (state is Categories)
-                        
                           return CategoryGraphs(
                               selectedCategory: state.selectedCategory,
                               list: state.list,
@@ -169,9 +168,12 @@ class _DesktopLayout extends State<DesktopLayout> {
                               isSmallView: widget.isSmallView);
 
                         if (state is Orders)
-                          return Text('Orders',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 24));
+                          return OrdersGraph(
+                              selectedOrder: state.selectedOrder,
+                              list: state.list,
+                              showSideLabel: widget.isSmallView,
+                              isMobile: false,
+                              isSmallView: widget.isSmallView);
 
                         if (state is Error)
                           return Center(
@@ -210,10 +212,20 @@ class _DesktopLayout extends State<DesktopLayout> {
                                 state: 1,
                               )),
                             );
+
                           if (state is Orders)
-                            return Text('Orders',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 24));
+                            return Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 25.0),
+                              child: Center(
+                                  child: CustomerDropDownButton(
+                                itemsList: state.list,
+                                selectedItemIndex: state.index,
+                                isMobile: false,
+                                isSmallView: widget.isSmallView,
+                                bloc: context.read<MainBloc>(),
+                                state: 2,
+                              )),
+                            );
 
                           if (state is Categories)
                             return Padding(

@@ -51,7 +51,7 @@ class Repository {
     }
   }
 
-  Future<List<OrderModel>> getorders() async {
+  Future<List<OrderModel>> getOrders() async {
     final request = await http
         .get(Uri.parse('https://northwind.vercel.app/api/orders'))
         .timeout(Duration(seconds: 30))
@@ -60,8 +60,12 @@ class Repository {
     var object = <OrderModel>[];
     if (request.statusCode == 200) {
       var body = jsonDecode(request.body);
+      int i = 1;
       for (var item in body) {
-        object.add(OrderModel.fromJson(item));
+        try {
+          object.add(OrderModel.fromJson(item, i));
+          i++;
+        } catch (e) {}
       }
       object.sort((a, b) => a.id.compareTo(b.id));
       // causes a bug because we call the API everytime state changes

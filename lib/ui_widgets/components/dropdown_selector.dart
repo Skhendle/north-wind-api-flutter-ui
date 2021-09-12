@@ -29,7 +29,6 @@ class _CustomerDropDownButtonState extends State<CustomerDropDownButton> {
   Widget build(BuildContext context) {
     return FractionallySizedBox(
         widthFactor: widget.isMobile ? 1 : 0.9,
-        // : (widget.isSmallView ? 0.9 : 0.9),
         heightFactor: widget.isMobile ? 1 : 0.9,
         child: DropdownButton<int>(
             value: currentItem,
@@ -40,7 +39,6 @@ class _CustomerDropDownButtonState extends State<CustomerDropDownButton> {
             ),
             isExpanded: true,
             onChanged: (int? newValue) {
-//          print(newValue);
               setState(() {
                 currentItem = (newValue)!;
               });
@@ -54,8 +52,8 @@ class _CustomerDropDownButtonState extends State<CustomerDropDownButton> {
                     index: (newValue == null) ? 0 : newValue - 1));
               }
               if (widget.state == 2) {
-                widget.bloc.add(ProductsEvent(
-                    index: (newValue == null) ? 0 : newValue - 1));
+                widget.bloc.add(
+                    OrdersEvent(index: (newValue == null) ? 0 : newValue - 1));
               }
             },
             items: convertList()));
@@ -82,19 +80,5 @@ class _CustomerDropDownButtonState extends State<CustomerDropDownButton> {
     }
 
     return list;
-  }
-}
-
-class LoadingState extends StatelessWidget {
-  const LoadingState({Key? key, required this.bloc, required this.event})
-      : super(key: key);
-
-  final MainBloc bloc;
-  final MainEvent event;
-
-  @override
-  Widget build(BuildContext context) {
-    bloc.add(event);
-    return Center(child: CircularProgressIndicator());
   }
 }

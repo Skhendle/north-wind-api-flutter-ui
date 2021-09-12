@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:novasat/models/orders.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+
 import 'package:intl/intl.dart';
 
 class OrdersHeading extends StatelessWidget {
@@ -18,34 +19,38 @@ class OrdersHeading extends StatelessWidget {
   Widget dateDisplay(String dateName, DateTime date) {
     return Column(
       children: [
+        Expanded(child: SizedBox.fromSize()),
         Expanded(
+            flex: 2,
             child: Text(
-          dateName,
-          textAlign: TextAlign.center,
-          style: (isMobile)
-              ? TextStyle(
-                  fontSize: (isSmallView) ? 18 : 20,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w300)
-              : TextStyle(
-                  fontSize: (isSmallView) ? 24 : 26,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w300),
-        )),
+              dateName,
+              textAlign: TextAlign.center,
+              style: (isMobile)
+                  ? TextStyle(
+                      fontSize: (isSmallView) ? 16 : 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w300)
+                  : TextStyle(
+                      fontSize: (isSmallView) ? 20 : 22,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w300),
+            )),
         Expanded(
+            flex: 2,
             child: Text(
-          DateFormat.yMMMMd('en_US').format(date).toString(),
-          textAlign: TextAlign.center,
-          style: (isMobile)
-              ? TextStyle(
-                  fontSize: (isSmallView) ? 18 : 20,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w300)
-              : TextStyle(
-                  fontSize: (isSmallView) ? 24 : 26,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w300),
-        ))
+              DateFormat.yMMMMd('en_US').format(date).toString(),
+              textAlign: TextAlign.center,
+              style: (isMobile)
+                  ? TextStyle(
+                      fontSize: (isSmallView) ? 16 : 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w300)
+                  : TextStyle(
+                      fontSize: (isSmallView) ? 20 : 22,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w300),
+            )),
+        Expanded(child: SizedBox.fromSize())
       ],
     );
   }
@@ -54,132 +59,220 @@ class OrdersHeading extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: dateDisplay('Order Date', order.orderDate )),
-        Expanded(child: dateDisplay('Required Date', order.requiredDate)),
+        Expanded(child: dateDisplay('Order Date', order.orderDate)),
         Expanded(child: dateDisplay('Shipped Date', order.shippedDate)),
+        Expanded(child: dateDisplay('Required Date', order.requiredDate))
       ],
     );
   }
 }
 
-class OrdersLineGraph extends StatefulWidget {
+class OrdersGraph extends StatefulWidget {
   // ignore: prefer_const_constructors_in_immutables
-  OrdersLineGraph({Key? key}) : super(key: key);
+  OrdersGraph(
+      {Key? key,
+      required this.selectedOrder,
+      required this.list,
+      required this.showSideLabel,
+      required this.isMobile,
+      required this.isSmallView})
+      : super(key: key);
 
+  final OrderModel selectedOrder;
+  final List<OrderModel> list;
+  final bool showSideLabel;
+  final bool isMobile;
+  final bool isSmallView;
   @override
-  _OrdersLineGraphState createState() => _OrdersLineGraphState();
+  _OrdersGraphState createState() => _OrdersGraphState();
 }
 
-class _OrdersLineGraphState extends State<OrdersLineGraph> {
-  List<_SalesData> data = [
-    _SalesData('Jan', 35),
-    _SalesData('Feb', 6),
-    _SalesData('Mar', 34),
-    _SalesData('Apr', 28),
-    _SalesData('May', 40)
-  ];
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Colors.green,
-        appBar: AppBar(
-          backgroundColor: Colors.pinkAccent,
-          title: Text('Half yearly sales analysis'),
-          centerTitle: true,
-        ),
-        body: Center(
-          child: SfCartesianChart(
-              primaryXAxis: CategoryAxis(),
-              // Chart title
-              // Enable legend
-              legend: Legend(isVisible: true),
-              // Enable tooltip
-              tooltipBehavior: TooltipBehavior(enable: true),
-              series: <ChartSeries<_SalesData, String>>[
-                LineSeries<_SalesData, String>(
-                    dataSource: data,
-                    xValueMapper: (_SalesData sales, _) => sales.year,
-                    yValueMapper: (_SalesData sales, _) => sales.sales,
-                    name: 'Sales',
-                    // Enable data label
-                    dataLabelSettings: DataLabelSettings(isVisible: true))
-              ]),
-        ));
-  }
-}
-
-class OrdersPieChart extends StatefulWidget {
-  // ignore: prefer_const_constructors_in_immutables
-  OrdersPieChart({Key? key}) : super(key: key);
-
-  @override
-  _OrdersPieChartState createState() => _OrdersPieChartState();
-}
-
-class _OrdersPieChartState extends State<OrdersPieChart> {
-  late List<GDPData> _chartData;
-  late TooltipBehavior _tooltipBehavior;
+class _OrdersGraphState extends State<OrdersGraph> {
+  late OrderDataSource orderDataSource;
 
   @override
   void initState() {
-    _chartData = getChartData();
-    _tooltipBehavior = TooltipBehavior(enable: true);
     super.initState();
+    orderDataSource = OrderDataSource(
+        order: widget.selectedOrder, orderData: widget.selectedOrder.products);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final formatCurrency = new NumberFormat.simpleCurrency();
+    return Scaffold(
+      backgroundColor: Color(0xFF990099),
+      appBar: AppBar(
+        backgroundColor: Colors.pinkAccent,
+        title: widget.isMobile
+            ? SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Text(widget.selectedOrder.name)),
+              )
+            : Text(widget.selectedOrder.name),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          Expanded(child: SizedBox.fromSize()),
+          Expanded(
+              flex: 4,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
+                child: OrdersGridGraph(
+                  selectedOrder: widget.selectedOrder,
+                  list: widget.list,
+                ),
+              )),
+          Expanded(
+              flex: 2,
+              child: Text(
+                'Grand Total: ${formatCurrency.format(productsTotal(widget.selectedOrder))}',
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ))
+        ],
+      ),
+    );
+  }
+
+  double productsTotal(OrderModel order) {
+    double total = 0;
+    for (var product in order.products) {
+      total = total +
+          product.quantity *
+              (product.unitPrice - product.unitPrice * product.discount);
+    }
+    return total;
+  }
+}
+
+class OrdersGridGraph extends StatefulWidget {
+  // ignore: prefer_const_constructors_in_immutables
+  OrdersGridGraph({
+    Key? key,
+    required this.selectedOrder,
+    required this.list,
+  }) : super(key: key);
+
+  final OrderModel selectedOrder;
+  final List<OrderModel> list;
+
+  @override
+  _OrdersGridGraphState createState() => _OrdersGridGraphState();
+}
+
+class _OrdersGridGraphState extends State<OrdersGridGraph> {
+  late OrderDataSource orderDataSource;
+
+  @override
+  void initState() {
+    super.initState();
+    orderDataSource = OrderDataSource(
+        order: widget.selectedOrder, orderData: widget.selectedOrder.products);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.green,
+        backgroundColor: Color(0xFF990099),
         appBar: AppBar(
           backgroundColor: Colors.pinkAccent,
-          title: Text('Half yearly sales analysis'),
+          title: Text('Ordered Products'),
           centerTitle: true,
         ),
-        body: Center(
-          child: SfCartesianChart(
-            legend: Legend(isVisible: true),
-            tooltipBehavior: _tooltipBehavior,
-            series: <ChartSeries>[
-              BarSeries<GDPData, String>(
-                  name: 'GDP',
-                  dataSource: _chartData,
-                  xValueMapper: (GDPData gdp, _) => gdp.continent,
-                  yValueMapper: (GDPData gdp, _) => gdp.gdp,
-                  dataLabelSettings: DataLabelSettings(isVisible: true),
-                  enableTooltip: true)
-            ],
-            primaryXAxis: CategoryAxis(),
-            primaryYAxis: NumericAxis(
-                edgeLabelPlacement: EdgeLabelPlacement.shift,
-                numberFormat: NumberFormat.simpleCurrency(decimalDigits: 0),
-                title: AxisTitle(text: 'GDP in billions of U.S. Dollars')),
-          ),
+        body: SfDataGrid(
+          source: orderDataSource,
+          columnWidthMode: ColumnWidthMode.fill,
+          columns: <GridColumn>[
+            GridColumn(
+                columnName: 'id',
+                label: Container(
+                    padding: EdgeInsets.all(16.0),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Order ID',
+                    ))),
+            GridColumn(
+                columnName: 'productId',
+                label: Container(
+                    padding: EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: Text('Product ID'))),
+            GridColumn(
+                columnName: 'unitPrice',
+                label: Container(
+                    padding: EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Unit Price',
+                      overflow: TextOverflow.ellipsis,
+                    ))),
+            GridColumn(
+                columnName: 'discount',
+                label: Container(
+                    padding: EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: Text('Discount'))),
+            GridColumn(
+                columnName: 'quantity',
+                label: Container(
+                    padding: EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: Text('Quantity'))),
+            GridColumn(
+                columnName: 'total',
+                label: Container(
+                    padding: EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    child: Text('Total'))),
+          ],
         ));
   }
+}
 
-  List<GDPData> getChartData() {
-    final List<GDPData> chartData = [
-      GDPData('Oceania', 1600),
-      GDPData('Africa', 2490),
-      GDPData('S America', 2900),
-      GDPData('Europe', 23050),
-      GDPData('N America', 24880),
-      GDPData('Asia', 34390),
-    ];
-    return chartData;
+class OrderDataSource extends DataGridSource {
+  /// Creates the order data source class with required details.
+  OrderDataSource(
+      {required OrderModel order,
+      required List<ProductDescriptionModel> orderData}) {
+    final formatCurrency = new NumberFormat.simpleCurrency();
+    _orderData = orderData
+        .map<DataGridRow>((e) => DataGridRow(cells: [
+              DataGridCell<int>(columnName: 'id', value: order.id),
+              DataGridCell<int>(columnName: 'productId', value: e.id),
+              DataGridCell<String>(
+                  columnName: 'unitPrice',
+                  value: formatCurrency.format(e.unitPrice)),
+              DataGridCell<double>(columnName: 'discount', value: e.discount),
+              DataGridCell<int>(columnName: 'quantity', value: e.quantity),
+              DataGridCell<String>(
+                  columnName: 'total',
+                  value: formatCurrency.format(
+                      productsTotal(e.unitPrice, e.discount, e.quantity))),
+            ]))
+        .toList();
   }
-}
 
-class _SalesData {
-  _SalesData(this.year, this.sales);
+  double productsTotal(double price, double discount, int quantity) {
+    return quantity * (price - price * discount);
+  }
 
-  final String year;
-  final double sales;
-}
+  List<DataGridRow> _orderData = [];
 
-class GDPData {
-  GDPData(this.continent, this.gdp);
-  final String continent;
-  final double gdp;
+  @override
+  List<DataGridRow> get rows => _orderData;
+
+  @override
+  DataGridRowAdapter buildRow(DataGridRow row) {
+    return DataGridRowAdapter(
+        cells: row.getCells().map<Widget>((e) {
+      return Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.all(8.0),
+        child: Text(e.value.toString()),
+      );
+    }).toList());
+  }
 }

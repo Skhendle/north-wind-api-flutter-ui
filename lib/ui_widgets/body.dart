@@ -4,9 +4,6 @@ import 'package:novasat/bloc/navigation/navigation_bloc.dart';
 import 'package:novasat/ui_widgets/desktop_view.dart';
 import 'package:novasat/ui_widgets/mobile_view.dart';
 
-import 'components/category.dart';
-import 'components/dropdown_selector.dart';
-
 class BodyView extends StatefulWidget {
   BodyView({Key? key}) : super(key: key);
   @override
@@ -66,9 +63,27 @@ class _BodyBuilder extends State<BodyBuilder> {
                     ? MobileView(isSmallView: false, pageState: state)
                     : MobileView(isSmallView: true, pageState: state)));
           }));
-        // Center(child: Text('Categories'));
+
 
         if (state is NavigationProducts)
+          return SafeArea(child: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+            return (constraints.maxWidth >= 640
+                ?
+                // Desktop View
+                ((constraints.maxWidth >= 960)
+                    // Check if it is large desktop view
+                    ? DesktopView(isSmallView: false, pageState: state)
+                    : DesktopView(isSmallView: true, pageState: state))
+                :
+                // Mobile View
+                ((constraints.maxWidth >= 320)
+                    // Check if it is smal mobile view or not
+                    ? MobileView(isSmallView: false, pageState: state)
+                    : MobileView(isSmallView: true, pageState: state)));
+          }));
+
+        if (state is NavigationOrders)
           return SafeArea(child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
             return (constraints.maxWidth >= 640

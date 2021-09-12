@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:novasat/bloc/main/main_bloc.dart';
+
 import 'package:novasat/bloc/navigation/navigation_bloc.dart';
 import 'package:novasat/ui_widgets/app_bar.dart';
 import 'package:novasat/ui_widgets/body.dart';
-import 'package:novasat/ui_widgets/desktop_view.dart';
-import 'package:novasat/ui_widgets/mobile_view.dart';
+
 
 /*
   Application Break Points
